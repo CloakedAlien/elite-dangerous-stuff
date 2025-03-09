@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Root PresetName="WarthogCombined2025" MajorVersion="4" MinorVersion="2">
+<Root PresetName="WarthogCombined_2.0" MajorVersion="4" MinorVersion="2">
 	<KeyboardLayout>en-US</KeyboardLayout>
 	<MouseXMode Value="Bindings_MouseRoll" />
 	<MouseXDecay Value="0" />
@@ -306,7 +306,7 @@
 	</SelectTarget>
 	<CycleNextTarget>
 		<Primary Device="Keyboard" Key="Key_G" />
-		<Seconodary Device="ThrustMasterWarthogCombined" Key="Joy_POV1Right" />
+		<Secondary Device="ThrustMasterWarthogCombined" Key="Joy_POV1Right" />
 	</CycleNextTarget>
 	<CyclePreviousTarget>
 		<Primary Device="{NoDevice}" Key="" />
