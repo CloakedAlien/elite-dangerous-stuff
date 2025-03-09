@@ -1,0 +1,198 @@
+include "target.tmh"
+
+int led1state = 0;
+int led2state = 0;
+int led3state = 0;
+int led4state = 0;
+int led5state = 0;
+float prevValue = -100;
+
+
+//program startup
+int main()
+{
+	// Exclude the joystick and the rudders, we only wish to make a virtual throttle
+	Configure(&Joystick,MODE_EXCLUDED);   	
+	Configure(&TFRPRudder, MODE_EXCLUDED);
+	
+	if(Init(&EventHandle)) return 1; // declare the event handler, return on error
+ 	 	
+ 	// Create the virtual axis from the physical ones
+ 	KeyAxis(&Throttle,THR_LEFT,0,AXMAP1(2048,
+		EXEC("SetZRot(); SetZ();"),
+		EXEC("SetZRot(); SetZ();"))
+	);
+ 	KeyAxis(&Throttle,THR_RIGHT,0,AXMAP1(2048,
+		EXEC("SetZRot(); SetZ();"),
+		EXEC("SetZRot(); SetZ();"))
+	);
+	
+	// Map the slider and "mouse"
+	MapAxis(&Throttle, THR_FC, DX_SLIDER_AXIS, AXIS_REVERSED);
+	MapAxis(&Throttle, JOYX, DX_X_AXIS);
+	MapAxis(&Throttle, JOYY, DX_Y_AXIS);
+		
+
+	// Map all the keys like they should be
+	MapKey(&Throttle, SC, DX1);
+	MapKey(&Throttle, LTB, DX15);
+	
+	MapKey(&Throttle, CSU, DXHATUP);
+	MapKey(&Throttle, CSD, DXHATDOWN);
+	MapKey(&Throttle, CSL, DXHATLEFT);
+	MapKey(&Throttle, CSR, DXHATRIGHT);
+	
+	MapKey(&Throttle, MSP, DX2);
+	
+	MapKey(&Throttle, MSU, DX3);
+	MapKey(&Throttle, MSD, DX5);
+	MapKey(&Throttle, MSL, DX6);
+	MapKey(&Throttle, MSR, DX4);
+	
+	MapKey(&Throttle, SPDF, DX7);
+	MapKey(&Throttle, SPDB, DX8);
+	
+	MapKey(&Throttle, BSF, DX9);
+	MapKey(&Throttle, BSB, DX10);
+	
+	MapKey(&Throttle, CHF, DX11);
+	MapKey(&Throttle, CHB, DX12);
+	
+	MapKey(&Throttle, PSF, DX13);
+	MapKey(&Throttle, PSB, DX14);
+	
+	MapKey(&Throttle, EFLNORM, DX16);
+	MapKey(&Throttle, EFRNORM, DX17);
+	
+	MapKey(&Throttle, EOLMOTOR, DX18);
+	MapKey(&Throttle, EOLIGN, DX31);
+	
+	MapKey(&Throttle, EORMOTOR, DX19);
+	MapKey(&Throttle, EORIGN, DX32);
+	
+	MapKey(&Throttle, APUON, DX20);
+	
+	MapKey(&Throttle, LDGH, DX21);
+	
+	MapKey(&Throttle, FLAPU, PULSE+DX22);
+	MapKey(&Throttle, FLAPD, PULSE+DX23);
+	
+	MapKey(&Throttle, EACON, DX24);
+	MapKey(&Throttle, RDRNRM, PULSE+DX25);
+	MapKey(&Throttle, RDRDIS, PULSE+DX25);
+
+	MapKey(&Throttle, APENG, DX26);
+	
+	MapKey(&Throttle, APPAT, DX27);
+	
+	MapKey(&Throttle, APALT, DX28);	
+	ActKey(PULSE+KEYON+LED(&Throttle, LED_INTENSITY, 129));
+	ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT-LED1)); 
+	ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT-LED2)); 
+	ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT-LED3)); 
+	ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT-LED4)); 
+	ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT-LED5)); 
+}
+
+int SetZRot()
+{
+	TrimDXAxis(DX_ZROT_AXIS, SET(GetZRotValue()));
+}
+
+int SetZ()
+{
+	TrimDXAxis(DX_Z_AXIS, SET(GetZValue()));
+}
+
+int GetZRotValue()
+{
+	int diff = (Throttle[THR_LEFT]-Throttle[THR_RIGHT]);
+	return diff / 11;
+}
+
+int GetZValue()
+{
+	int zValue = -(Throttle[THR_RIGHT]/32) * 1.7;
+	float ledValue = (-zValue) / 512.0; // Should give us a range from -2 to 2
+	//if ( ledValue!=prevValue )
+	//	printf("%f\xa", ledValue);
+	
+	if ( ledValue>-2 )
+	{
+		if ( led5state==0 ) {
+			ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT+LED5)); 
+			led5state=1;
+		}
+	} else
+	{
+		if ( led5state==1 ) {
+			ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT-LED5));
+			led5state=0;
+		}
+	}
+	
+	if ( ledValue>-1 )
+	{
+		if ( led4state==0 ) {
+			ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT+LED4)); 
+			led4state=1;
+		}
+	} else
+	{
+		if ( led4state==1 ) {
+			ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT-LED4));
+			led4state=0;
+		}
+	}	
+	
+	if ( ledValue>0 )
+	{
+		if ( led3state==0 ) {
+			ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT+LED3)); 
+			led3state=1;
+		}
+	} else
+	{
+		if ( led3state==1 ) {
+			ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT-LED3));
+			led3state=0;
+		}
+	}		
+	
+	if ( ledValue>1 )
+	{
+		if ( led2state==0 ) {
+			ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT+LED2)); 
+			led2state=1;
+		}
+	} else
+	{
+		if ( led2state==1 ) {
+			ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT-LED2));
+			led2state=0;
+		}
+	}		
+
+if ( ledValue>=2 )
+	{
+		if ( led1state==0 ) {
+			ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT+LED1)); 
+			led1state=1;
+		}
+	} else
+	{
+		if ( led1state==1 ) {
+			ActKey(PULSE+KEYON+LED(&Throttle, LED_ONOFF, LED_CURRENT-LED1));
+			led1state=0;
+		}
+	}		
+	
+	return zValue;
+}
+
+//event handler
+int EventHandle(int type, alias o, int x)
+{
+    DefaultMapping(&o, x);	
+	//add event handling code here
+}

@@ -417,7 +417,7 @@
 	</IncreaseSystemsPower>
 	<ResetPowerDistribution>
 		<Primary Device="ThrustMasterWarthogJoystick" Key="Joy_13" />
-		<Secondary Device="{NoDevice}" Key="" />
+		<Secondary Device="{NoDevice}" Key="" />		
 	</ResetPowerDistribution>
 	<HMDReset>
 		<Primary Device="Keyboard" Key="Key_F12" />
